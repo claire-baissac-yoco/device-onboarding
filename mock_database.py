@@ -35,79 +35,48 @@ class mockDatabase:
         return None
 
     def set_device_package_info(self, serial_number, box_number, crate_number):
-        for i in range(len(self._device_list)):
-            try:
-                if self._device_list[i].get_serial_number() == serial_number:
-                    if self._device_list[i].set_package_info(box_number, crate_number):
-                        return None
-                    else:
-                        print("ERROR")
-            except Exception as err:
-                raise err
-
-        return None
+        try:
+            self.get_device_by_serial_number(serial_number).set_package_info(box_number, crate_number)
+        except Exception as err:
+            raise err
 
     def set_device_damage_rating(self, serial_number, damage_rating):
-        for i in range(len(self._device_list)):
-            try:
-                if self._device_list[i].get_serial_number() == serial_number:
-                    if self._device_list[i].set_is_damaged(damage_rating):
-                        return None
-                    else:
-                        print("ERROR")
-            except Exception as err:
-                raise err
-
-        return None
+        try:
+            self.get_device_by_serial_number(serial_number).set_is_damaged(damage_rating)
+        except Exception as err:
+            raise err
 
     def update_device_sim_card(self, serial_number, snn, imsi):
-        for i in range(len(self._device_list)):
-            try:
-                if self._device_list[i].get_serial_number() == serial_number:
-                    if self._device_list[i].assign_sim_card(SimCard(snn, imsi)):
-                        return None
-                    else:
-                        print("ERROR")
-            except Exception as err:
-                raise err
-
-        return None
+        try:
+            self.get_device_by_serial_number(serial_number).assign_sim_card(SimCard(snn, imsi))
+        except Exception as err:
+            raise err
 
     def flash_device(self, serial_number, mode):
-        for i in range(len(self._device_list)):
-            try:
-                if self._device_list[i].get_serial_number() == serial_number:
-                    flash_device = FlashDevice(mode)
-                    print(flash_device.flash_device())
-                    if flash_device.flash_device():
-                        self._device_list[i].flash()
-                    return None
-            except Exception as err:
-                raise err
-
-        return None
+        try:
+            flash_device = FlashDevice(mode)
+            if flash_device.flash_device():
+                self.get_device_by_serial_number(serial_number).flash()
+        except Exception as err:
+            raise err
 
     def inject_keys(self, serial_number, keys, mode):
-        for i in range(len(self._device_list)):
-            try:
-                if self._device_list[i].get_serial_number() == serial_number:
-                    key_injector = KeyInjector(mode)
-                    if key_injector.injectKey(keys):
-                        self._device_list[i].inject_keys(keys)
-                    return None
-            except Exception as err:
-                raise err
+        try:
+            key_injector = KeyInjector(mode)
+            if key_injector.injectKey(keys):
+                self.get_device_by_serial_number(serial_number).inject_keys(keys)
+        except Exception as err:
+            raise err
 
-        return None
-
+    def send_device_for_repacking(self, serial_number):
+        try:
+            self.get_device_by_serial_number(serial_number).send_for_repacking()
+        except Exception as err:
+            raise err
 
     def set_device_warehouse(self, serial_number, warehouse_info):
-        for i in range(len(self._device_list)):
-            try:
-                if self._device_list[i].get_serial_number() == serial_number:
-                    self._device_list[i].set_warehouse(Warehouse(*warehouse_info))
-            except Exception as err:
-                raise err
-
-        return None
+        try:
+            self.get_device_by_serial_number(serial_number).set_warehouse(Warehouse(*warehouse_info))
+        except Exception as err:
+            raise err
 
