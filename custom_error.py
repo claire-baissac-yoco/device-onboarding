@@ -3,3 +3,6 @@ class InjectionFailureException(Exception):
 
 class FlashFailureException(Exception):
     pass
+
+class InvalidOperationException(Exception):
+    pass
