@@ -27,18 +27,20 @@ def create_database_with_dummy_device() -> mockDatabase:
     return database
 
 def update_device_to_given_state(database: mockDatabase, serial_number, state) -> mockDatabase:
-    func_names = ['', '', '', 'set_device_package_info', 'set_device_damage_rating', 'update_device_sim_card', 'flash_device', 'inject_keys', 'set_device_warehouse']
-    serial_number, imei, box_number, crate_number, is_damaged = get_dummy_device_info()
+    func_names = ['', '', '', 'set_device_package_info', 'set_device_damage_rating', 'update_device_sim_card', 'flash_device', 'inject_keys', 'send_device_for_repacking', 'set_device_warehouse']
+    box_number, crate_number, is_damaged = get_dummy_device_info()[2:]
     snn, imsi = 1, 2
     mode = 1
     keys = gen_keys()
-    func_params = ['', '', '', f'{box_number}, {crate_number}', f'{is_damaged}', f'{snn}, {imsi}', f'{mode}', 'keys, mode', '{{1, 2, 3, 4, 5, 6}}']
+    func_params = ['', '', '', f'{box_number}, {crate_number}', f'{is_damaged}', f'{snn}, {imsi}', f'{mode}', 'keys, mode', '', '[1, 2, 3, 4, 5, 6]']
     last = False
     for st, name, params in zip(DeviceState, func_names, func_params):
+        print(st, name, params)
         if st == state:
             last = True
         if not name == '':
-            to_eval = f'database.{name}(serial_number, {params})'
+            params = f', {params}' if params else ''
+            to_eval = f'database.{name}(serial_number{params})'
             print(to_eval)
             eval(to_eval)
 
@@ -46,7 +48,6 @@ def update_device_to_given_state(database: mockDatabase, serial_number, state) -
             break
 
     return database
-
 
 def test_can_create_device():
     serial_number = get_dummy_device_info()[0]
@@ -99,7 +100,7 @@ def test_can_flash_device():
     database.flash_device(serial_number, 1)
     assert database.get_device_by_serial_number(serial_number).get_state() == DeviceState.device_flashed
 
-def test_flash_device_raises_exception():
+def test_flash_device_raises_exception_with_mode_zero():
     with pytest.raises(FlashFailureException):
         serial_number  = get_dummy_device_info()[0]
         database = create_database_with_dummy_device()
@@ -114,10 +115,25 @@ def test_can_inject_keys():
     database.inject_keys(serial_number, keys, 1)
     assert database.get_device_by_serial_number(serial_number).get_state() == DeviceState.keys_injected
 
-def test_inject_keys_raises_exception():
+def test_inject_keys_raises_exception_with_mode_zero():
     with pytest.raises(InjectionFailureException):
         serial_number  = get_dummy_device_info()[0]
         database = create_database_with_dummy_device()
         database = update_device_to_given_state(database, serial_number, DeviceState.device_flashed)
         keys = gen_keys()
         database.inject_keys(serial_number, keys, 0)
+
+def test_can_send_for_repacking():
+    serial_number  = get_dummy_device_info()[0]
+    database = create_database_with_dummy_device()
+    database = update_device_to_given_state(database, serial_number, DeviceState.keys_injected)
+    database.send_device_for_repacking(serial_number)
+    assert database.get_device_by_serial_number(serial_number).get_state() == DeviceState.sent_for_repacking
+
+def test_can_set_device_warehouse():
+    serial_number  = get_dummy_device_info()[0]
+    database = create_database_with_dummy_device()
+    database = update_device_to_given_state(database, serial_number, DeviceState.sent_for_repacking)
+    database.set_device_warehouse(serial_number, [1, 2, 3, 4, 5, 6])
+    assert database.get_device_by_serial_number(serial_number).get_state() == DeviceState.stored_in_warehouse
+
