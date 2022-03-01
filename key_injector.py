@@ -1,4 +1,3 @@
-from device import Device
 from custom_error import InjectionFailureException
 
 class IKeyInjector:
@@ -6,12 +5,11 @@ class IKeyInjector:
         pass
 
 class KeyInjector(IKeyInjector):
-    def __init__(self, device: Device) -> None:
-        self._device = device
+    def __init__(self, state: int) -> None:
+        self._state = state
 
     def injectKey(self, key: list) -> bool:
-        try:
-            self._device.inject_key(key)
+        if self._state:
             return True
-        except:
+        else:
             raise InjectionFailureException
