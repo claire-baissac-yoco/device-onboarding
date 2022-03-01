@@ -77,6 +77,7 @@ class Device:
             raise InvalidOperationException
 
     def set_warehouse(self, warehouse: Warehouse):
+        print("here")
         if self.process_is_allowed(DeviceState.stored_in_warehouse):
             self._warehouse = warehouse
             self._state = DeviceState.stored_in_warehouse
@@ -85,6 +86,7 @@ class Device:
             raise InvalidOperationException
 
     def process_is_allowed(self, desired_state):
-        if not desired_state.value[0] - self._state.value[0] <= 1:
+        print(desired_state.value, self._state.value)
+        if not desired_state.value - self._state.value <= 1:
             return False
         return True
