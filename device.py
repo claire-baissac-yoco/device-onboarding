@@ -8,6 +8,7 @@ class Device:
         self._serial_number = serial_number
         self._imei = imei
         self._state = DeviceState.imei_recorded
+        self._damage_rating = 0
 
     def set_imei(self, imei: int) -> None:
         self._imei = imei
@@ -31,7 +32,7 @@ class Device:
     def get_crate_number(self):
         return self._box_number
 
-    def set_is_damaged(self, damage_rating) -> bool:
+    def set_damage_rating(self, damage_rating) -> bool:
         if self.process_is_allowed(DeviceState.damage_recorded):
             self._damage_rating = damage_rating
             self._state = DeviceState.damage_recorded
@@ -39,8 +40,8 @@ class Device:
         else:
             raise InvalidOperationException
 
-    def get_is_damaged(self):
-        return self._is_damaged
+    def get_damage_rating(self):
+        return self._damage_rating
 
     def assign_sim_card(self, simcard: SimCard) -> bool:
         if self.process_is_allowed(DeviceState.sim_card_assigned):
@@ -57,7 +58,7 @@ class Device:
         if self.process_is_allowed(DeviceState.device_flashed):
             self._state = DeviceState.device_flashed
         else:
-            raise InvalidOperationException
+            raise InvalidOperationException('INVALID')
 
     def get_state(self):
         return self._state
@@ -74,7 +75,7 @@ class Device:
             self._state = DeviceState.sent_for_repacking
             return True
         else:
-            raise InvalidOperationException
+            raise InvalidOperationException('INVALID')
 
     def set_warehouse(self, warehouse: Warehouse):
         print("here")
@@ -88,5 +89,7 @@ class Device:
     def process_is_allowed(self, desired_state):
         print(desired_state.value, self._state.value)
         if not desired_state.value - self._state.value <= 1:
+            return False
+        elif self._damage_rating > 0:
             return False
         return True

@@ -6,3 +6,6 @@ class FlashFailureException(Exception):
 
 class InvalidOperationException(Exception):
     pass
+
+class NoSuchDeviceException(Exception):
+    pass
