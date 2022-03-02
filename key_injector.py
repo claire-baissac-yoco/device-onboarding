@@ -9,7 +9,7 @@ class KeyInjector(IKeyInjector):
         self._state = state
 
     def injectKey(self, key: list) -> bool:
-        if self._state:
+        if self._state == 1:
             return True
         else:
             raise InjectionFailureException

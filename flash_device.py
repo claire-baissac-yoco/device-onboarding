@@ -1,4 +1,3 @@
-from device import Device
 from custom_error import FlashFailureException
 
 class IFlashDevice:
@@ -13,4 +12,4 @@ class FlashDevice(IFlashDevice):
         if self._state == 1:
             return True
         else:
-            raise FlashFailureException
+            raise FlashFailureException('flash err')
