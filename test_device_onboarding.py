@@ -2,7 +2,7 @@ import pytest
 from device import Device
 from mock_database import mockDatabase
 from const import DeviceState
-from custom_error import FlashFailureException, InjectionFailureException, InvalidOperationException
+from custom_error import FlashFailureException, InjectionFailureException, InvalidOperationException, NoSuchDeviceException
 
 def gen_keys():
     return [0], [0], [0]
@@ -68,9 +68,10 @@ def test_can_get_device_from_device_list_by_imei():
     database = create_database_with_dummy_device()
     assert database.get_device_by_imei(imei).get_imei() == imei
 
-def test_return_none_when_get_device_not_exist():
-    database = create_database_with_dummy_device()
-    assert database.get_device_by_imei(0) == None
+def test_raise_error_when_get_device_not_exist():
+    with pytest.raises(NoSuchDeviceException):
+        database = create_database_with_dummy_device()
+        database.get_device_by_imei(0)
 
 def test_can_record_package_info():
     serial_number, _, box_number, crate_number = get_dummy_device_info()[0:4]

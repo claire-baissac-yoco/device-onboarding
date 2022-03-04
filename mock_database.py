@@ -1,3 +1,4 @@
+from custom_error import NoSuchDeviceException
 from device import Device
 from sim_card import SimCard
 from flash_device import FlashDevice
@@ -22,7 +23,7 @@ class mockDatabase:
             except:
                 raise ValueError
 
-        return None
+        raise NoSuchDeviceException(f'Device with serial number {serial_number} does not exist')
 
     def get_device_by_imei(self, imei):
         for device in self._device_list:
@@ -32,7 +33,7 @@ class mockDatabase:
             except:
                 raise ValueError
 
-        return None
+        raise NoSuchDeviceException(f'Device with IMEI {imei} does not exist')
 
     def set_device_package_info(self, serial_number, box_number, crate_number):
         try:
@@ -42,7 +43,7 @@ class mockDatabase:
 
     def set_device_damage_rating(self, serial_number, damage_rating):
         try:
-            self.get_device_by_serial_number(serial_number).set_is_damaged(damage_rating)
+            self.get_device_by_serial_number(serial_number).set_damage_rating(damage_rating)
         except Exception as err:
             raise err
 

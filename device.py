@@ -87,7 +87,6 @@ class Device:
             raise InvalidOperationException
 
     def process_is_allowed(self, desired_state):
-        print(desired_state.value, self._state.value)
         if not desired_state.value - self._state.value <= 1:
             return False
         elif self._damage_rating > 0:
